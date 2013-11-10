@@ -1,7 +1,5 @@
-(ns quad-tree.core-test
-  (:use clojure.test
-        quad-tree.core))
+(ns noisesmith.quad-tree.quad-test
+  (:require [clojure.test :as test :refer [deftest testing is]]
+            [quad-tree.quad :as quad]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+
