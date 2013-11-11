@@ -65,10 +65,10 @@
 
 (defn non-overlap?
   [{:keys [x y x' y'] :as quad} [x'' y''] [x''' y''']]
-  (or (<= x' x'')
-      (<= y' y'')
-      (>= x x''')
-      (>= y y''')))
+  (or (< x' x'')
+      (< y' y'')
+      (> x x''')
+      (> y y''')))
 
 (def overlap?
   (comp not non-overlap?))
