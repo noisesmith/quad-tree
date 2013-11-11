@@ -3,6 +3,18 @@
 
 (defrecord quadress [res bits-x bits-y])
 
+(defn path
+  [quadress]
+  (let [res (:res quadress)
+        path-x (ops/rev (:bits-x quadress) res)
+        path-y (ops/rev (:bits-y quadress) res)]
+    (for [step (range res)]
+      (case [(bit-test path-x step) (bit-test path-y step)]
+        ([true true]) :se
+        ([true false]) :ne
+        ([false true]) :sw
+        ([false false]) :nw))))
+
 (declare step)
 (defn make
   [x y width height & [epsilon]]
