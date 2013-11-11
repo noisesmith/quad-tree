@@ -1,5 +1,7 @@
 (ns noisesmith.quad-tree.quad
-  (:require [noisesmith.quad-tree.ops :as ops]))
+  (:require [noisesmith.quad-tree.ops :as ops]
+            [analemma.svg :as svg]
+            [analemma.xml :as xml]))
 
 (defrecord quad [ne se sw nw x x' y y' properties])
 
@@ -63,12 +65,23 @@
                quad)]
     quad))
 
+(defn walk
+  "Do something for each quad within the tree"
+  [f quad]
+  (cons
+   (f quad)
+   (mapcat (partial walk f)
+           (filter identity [(:nw quad)
+                             (:ne quad)
+                             (:se quad)
+                             (:sw quad)]))))
+
 (defn non-overlap?
   [{:keys [x y x' y'] :as quad} [x'' y''] [x''' y''']]
-  (or (< x' x'')
-      (< y' y'')
-      (> x x''')
-      (> y y''')))
+  (or (<= x' x'')
+      (<= y' y'')
+      (>= x x''')
+      (>= y y''')))
 
 (def overlap?
   (comp not non-overlap?))
@@ -81,6 +94,7 @@
 (defn insert
   [[x y :as upper-left] [x' y' :as lower-right] quad mark]
   (let [deeper? (fn [q]
+                  #_
                   (println [x y x' y'] ((juxt :x :y :x' :y') q))
                   (or (= [x y x' y'] ((juxt :x :y :x' :y') q))
                       (and (overlap? q upper-left lower-right)
@@ -90,3 +104,27 @@
                     (mark q)
                     q))]
     (unfold quad updater deeper?)))
+
+(defn ->svg
+  [{:keys [x y x' y'] :as quad}]
+  (svg/rect x y (- x' x) (- y' y)))
+
+(defn ->color
+  [quad {:keys [fg bg opacity] :as color
+         :or {fg "#000000"
+              bg "#000000"
+              opacity 0.1}}]
+  (svg/style quad
+             :fill-opacity opacity
+             :stroke fg
+             :fill bg))
+
+(defn render
+  [quad-tree & [file colors]]
+  (let [file (or file "test.svg")
+        colors (or colors (cycle [{}]))
+        quads (walk identity quad-tree)]
+    (->> (map #(->color (->svg %2) %) colors quads)
+         (apply svg/svg)
+         xml/emit
+         (spit file))))
