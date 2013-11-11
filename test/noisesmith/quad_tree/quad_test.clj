@@ -13,3 +13,12 @@
           :x' 1
           :y' 1
           :properties #{}})))
+
+(deftest split
+  (is (= {:x 0
+          :y 0
+          :x' 1/2
+          :y' 1/2
+          :x'' 1
+          :y'' 1}
+         (quad/split (quad/make-quad [0 0] [1 1])))))
