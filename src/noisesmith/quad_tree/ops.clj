@@ -7,13 +7,28 @@
     (bit-set n position)))
 
 (defn eps=
-  [epsilon]
-  (fn [a b]
-    (let [diff (- a b)]
-      (<= (if (< diff 0)
-           (* diff -1)
-           diff)
-          epsilon))))
+  [& [epsilon]]
+  (let [epsilon (or epsilon 0.5)]
+    (fn [a b]
+      (let [diff (- a b)]
+        (<= (if (< diff 0)
+              (* diff -1)
+              diff)
+            epsilon)))))
+
+(defn eps<
+  [& [epsilon]]
+  (let [epsilon (or epsilon 0.5)]
+    (fn [& args]
+      (every? #(< % epsilon)
+              (apply map - (partition 2 1 args))))))
+
+(defn eps>
+  [& [epsilon]]
+  (let [epsilon (or epsilon 0.5)]
+    (fn [& args]
+      (every? #(< % epsilon)
+              (apply map #(- %2 %1) (partition 2 1 args))))))
 
 (defn show-bits
   [n c]
@@ -37,3 +52,9 @@
               flipping))
           0
           (range resolution)))
+
+(defn area
+  "the area of a quad"
+  [q]
+  (* (- (:x' q) (:x q))
+     (- (:y' q) (:y q))))
