@@ -6,9 +6,16 @@
     #noisesmith.quad_tree.quad.quad{:ne nil, :se nil, :sw nil, :nw nil, :x 0, :x' 1024, :y 0, :y' 1024, :pr #{}}
     user> (quad/render q) ; test.svg now exists, it can be loaded in a browser or inkscape
     nil
-    user> (quad/render (quad/insert q #(update-in % [:pr] assoc :color {:fg "#ffffff" :bg "#000000" :opacity 0.6}) (quad/make-quad 258 258 700 700))) ; colorizing "marked" paths so we can easily differentiate them in the svg
+    user> (def fill #(update-in % [:pr] assoc :color {:fg "#ffffff" :bg "#000000" :opacity 0.6})) ; set colors
+    #'user/fill
+    user> (def to-insert (quad/make-quad 258 258 700 700)) ; to-insert describes the space to mark
+    #'user/to-insert
+    user> (def inserted (quad/insert q fill to-insert))
+    #'user/inserted
+    user> (quad/render inserted) ; test.svg now has with the regions overlapping to-insert with a white border
     nil
-    user> 
+
+![resulting image](test.png)
 
 Copyright © 2013 noisesmith@gmail.com justin glenn smith
 
